@@ -96,7 +96,7 @@ def build_application(checkout: Path, version: str, profile: Path, environment: 
     run([
         "cargo", "tauri", "build", "--target", RUST_TARGET, "--bundles", "app", "--no-sign",
         "--config", f"src-tauri/{SIGNED_OVERLAY}", "--config", json.dumps({"version": version}),
-    ], checkout / "web", environment)
+    ], checkout, environment)
     return next((checkout / TAURI_DIRECTORY / "target" / RUST_TARGET / "release/bundle/macos").glob("*.app"))
 
 

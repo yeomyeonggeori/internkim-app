@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repository_root="$(cd "$(dirname "$0")/.." && pwd)"
-tauri_directory="$repository_root/web/src-tauri"
+tauri_directory="$repository_root/src-tauri"
 source_file="$tauri_directory/gen/apple/NotificationService/NotificationService.swift"
 bundle_template="$tauri_directory/macos/notification-service/Info.plist"
 extension="$tauri_directory/signing/NotificationService.appex"
@@ -10,7 +10,7 @@ extension="$tauri_directory/signing/NotificationService.appex"
 usage() {
   echo "usage: build-mac-notification-service --version <version>" >&2
   echo "  compiles the notification service extension the iPhone app ships for Apple silicon Macs and" >&2
-  echo "  places it, unsigned, in web/src-tauri/signing for tauri.macos-signed.conf.json to bundle;" >&2
+  echo "  places it, unsigned, in src-tauri/signing for tauri.macos-signed.conf.json to bundle;" >&2
   echo "  the version is the app's, which an extension has to carry too" >&2
   exit 1
 }

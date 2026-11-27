@@ -3,12 +3,12 @@ set -euo pipefail
 
 repository_root="$(cd "$(dirname "$0")/.." && pwd)"
 commands_file="$repository_root/internal/desktop/commands.json"
-binaries_directory="$repository_root/web/src-tauri/binaries"
+binaries_directory="$repository_root/src-tauri/binaries"
 
 usage() {
   echo "usage: prepare-agent-desktop [--target <rust target triple>]" >&2
   echo "  places the releases of agent-desktop and agent-browser that internal/desktop/commands.json pins," >&2
-  echo "  with the helper agent-desktop needs, in web/src-tauri/binaries for Tauri's bundle.externalBin;" >&2
+  echo "  with the helper agent-desktop needs, in src-tauri/binaries for Tauri's bundle.externalBin;" >&2
   echo "  the target defaults to this machine's (rustc -vV)" >&2
   exit 1
 }

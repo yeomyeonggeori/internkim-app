@@ -16,7 +16,7 @@ pub struct CommandSet {
 
 pub static COMMANDS: LazyLock<CommandSet> = LazyLock::new(|| {
     serde_json::from_str(include_str!(
-        "../../../../../internal/desktop/commands.json"
+        "../../../../internal/desktop/commands.json"
     ))
     .expect("internal/desktop/commands.json is not a command set")
 });

@@ -43,7 +43,7 @@ def development_team(checkout: Path) -> str:
 
 def build_archive(checkout: Path, version: str, build_number: str, environment: dict[str, str]) -> Path:
     override = json.dumps({"version": version, "bundle": {"iOS": {"bundleVersion": build_number}}})
-    run(["cargo", "tauri", "ios", "build", "--archive-only", "--config", override], checkout / "web", environment)
+    run(["cargo", "tauri", "ios", "build", "--archive-only", "--config", override], checkout, environment)
     return checkout / APPLE_PROJECT_DIRECTORY / "build" / ARCHIVE_NAME
 
 

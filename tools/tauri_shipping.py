@@ -9,7 +9,7 @@ from collections.abc import Iterator
 from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
-TAURI_DIRECTORY = Path("web/src-tauri")
+TAURI_DIRECTORY = Path("src-tauri")
 API_KEY_VARIABLES = ("APPLE_API_KEY", "APPLE_API_ISSUER", "APPLE_API_KEY_PATH")
 FAILURE_OUTPUT_LINES = 20
 
