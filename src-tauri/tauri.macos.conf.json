@@ -5,6 +5,16 @@
       "binaries/agent-desktop-macos-helper",
       "binaries/agent-browser"
     ],
-    "macOS": { "infoPlist": "macos/Info.plist" }
+    "macOS": {
+      "infoPlist": "macos/Info.plist"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJCRjhDRjhGNDNDMjNBMEEKUldRS09zSkRqOC80SzQ3L09qR2FRL3FOK2IzYVQyZkFQV0EvMmIyTmpMNnpRTUpUYVlFWEg0Y0kK",
+      "endpoints": [
+        "https://github.com/yeomyeonggeori/internkim-app/releases/latest/download/latest.json"
+      ]
+    }
   }
 }

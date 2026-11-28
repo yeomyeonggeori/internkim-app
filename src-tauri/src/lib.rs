@@ -22,8 +22,10 @@ pub fn run() {
         .setup(window_background::paint_every_window)
         .on_window_event(window_background::repaint_on_appearance_change);
     #[cfg(target_os = "macos")]
-    let builder =
-        builder.on_window_event(macos_window_lifecycle::hide_main_window_instead_of_closing);
+    let builder = builder
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
+        .on_window_event(macos_window_lifecycle::hide_main_window_instead_of_closing);
     #[cfg(any(target_os = "android", target_os = "ios", target_os = "macos"))]
     let builder = builder
         .plugin(tauri_plugin_notifications::init())
