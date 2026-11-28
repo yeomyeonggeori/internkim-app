@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+"""Publish what tools/ship-tauri-macos shipped as the release installed Mac apps update from.
+
+An installed app reads `latest.json` from this repository's newest release.
+This writes that file for the version, and creates the release `v<version>`
+holding it, the update archive, the archive's signature, the disk image, and
+a copy of the disk image under a name that never changes, so one download
+address always gives the newest app.
+
+It refuses a version that is not above the newest release: the updater only
+moves forward, and a lower release marked newest would hide the real one.
+
+    tools/publish-tauri-macos --version 1.0.0 --from <the directory ship-tauri-macos wrote to>
+"""
+
+import argparse
+import datetime
+import json
+import shutil
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from mac_update_archive import ARCHIVE_SUFFIX, SIGNATURE_SUFFIX
+from mac_update_manifest import REPOSITORY, UnusableRelease, release_tag, write_update_manifest
+from tauri_shipping import ShipFailure, run, say
+
+DISK_IMAGE_SUFFIX = ".dmg"
+LASTING_DISK_IMAGE_NAME = "internkim-macos-arm64.dmg"
+NO_RELEASE_YET = "release not found"
+
+
+def only_file(directory: Path, version: str, suffix: str) -> Path:
+    found = sorted(directory.glob(f"*_{version}_*{suffix}"))
+    if len(found) != 1:
+        raise ShipFailure(f"{directory} holds {len(found)} files for {version} ending in {suffix}, and a release takes exactly one")
+    return found[0]
+
+
+def numbers_of(version: str) -> tuple[int, ...]:
+    return tuple(int(part) for part in version.split("."))
+
+
+def newest_released_version(directory: Path) -> str | None:
+    try:
+        answer = run(["gh", "release", "view", "--repo", REPOSITORY, "--json", "tagName"], directory)
+    except ShipFailure as failure:
+        if NO_RELEASE_YET in str(failure):
+            return None
+        raise
+    return json.loads(answer)["tagName"].removeprefix("v")
+
+
+def refuse_a_version_not_above_the_newest(version: str, directory: Path) -> None:
+    newest = newest_released_version(directory)
+    if newest is not None and numbers_of(version) <= numbers_of(newest):
+        raise ShipFailure(f"{version} is not above {newest}, the newest release, and installed apps only update upwards")
+
+
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--version", required=True, help="the version ship-tauri-macos was given")
+    parser.add_argument("--from", dest="directory", required=True, type=Path, help="the directory ship-tauri-macos wrote to")
+    return parser.parse_args()
+
+
+def publish(version: str, directory: Path) -> str:
+    tag = release_tag(version)
+    archive = only_file(directory, version, ARCHIVE_SUFFIX)
+    signature = only_file(directory, version, ARCHIVE_SUFFIX + SIGNATURE_SUFFIX)
+    image = only_file(directory, version, DISK_IMAGE_SUFFIX)
+    refuse_a_version_not_above_the_newest(version, directory)
+    published_at = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    manifest = write_update_manifest(directory, version, archive, signature, published_at)
+    lasting_image = Path(shutil.copy2(image, directory / LASTING_DISK_IMAGE_NAME))
+    assets = [str(path) for path in (manifest, archive, signature, image, lasting_image)]
+    return run(["gh", "release", "create", tag, "--repo", REPOSITORY, "--title", tag, "--generate-notes", "--latest"] + assets, directory).strip()
+
+
+def main() -> int:
+    arguments = parse_arguments()
+    try:
+        say(f"published: {publish(arguments.version, arguments.directory.resolve())}")
+    except (ShipFailure, UnusableRelease) as failure:
+        say(f"failed: {failure}")
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
