@@ -42,3 +42,11 @@ the codebase. Keep it short, concrete, and updated when workflows change.
 - `tools/ship-tauri-ios` and `tools/ship-tauri-macos` build from a commit,
   `origin/main` unless `--ref` names another, in a throwaway checkout. Their
   `--help` says what each needs.
+- A Mac release is two steps: `tools/ship-tauri-macos` writes the disk image,
+  the update archive and its signature to a directory, and
+  `tools/publish-tauri-macos` creates the release installed apps update from.
+  Publishing cannot be undone for an app that already took the update, so
+  ask before running it.
+- The updater key signs every update. An installed app accepts no other key,
+  so losing the key or its password ends updates for every installed copy.
+  `.monkeys` names what the vault holds; the key itself is never in the tree.

@@ -24,9 +24,10 @@ The Mac build needs Xcode, and the Android modules need an SDK named in
 cargo tauri build --target aarch64-apple-darwin --bundles app --no-sign
 cargo check --manifest-path src-tauri/Cargo.toml --target aarch64-apple-ios
 android/gradlew -p android :attendance-widget:testDebugUnitTest :sender-notification:compileDebugJavaWithJavac
+python3 -m unittest discover -s tools/tests
 ```
 
-Run the ones for the platforms your diff touches. No workflow runs them after
+Run the ones for the platforms your diff touches, and the last one when it touches `tools/`. The tools need Python 3.10 or newer. No workflow runs them after
 you push, so a pull request that skipped them has not been checked.
 
 ## Branches
